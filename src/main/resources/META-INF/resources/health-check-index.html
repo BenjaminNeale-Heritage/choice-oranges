@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Health Check - Red Hat Fuse</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1>Health Check - Red Hat Fuse</h1>
+            <p class="lead">
+              This Fuse booster demonstrates how to use the Kubernetes health check to determine whether a container is alive and ready to serve the traffic for the HTTP endpoints of an application.</p>
+            <p class="lead">
+                To demonstrate this behavior, this booster application configures a <code>/health</code> HTTP endpoint that Kubernetes uses to issue HTTP requests. If the container is alive then the Health HTTP endpoint returns HTTP code 200 as a response and Kubernetes takes no further action. If the HTTP endpoint stops returning a 200 response, Kubernetes restarts the container pod.</p>
+            <p class="lead">
+                This page invokes the Greetings Service every five seconds.</p>
+           <p class="lead">  
+                To demonstrate the behavior of the health check, click the <code>Stop Camel Context</code> button.</p>
+            <p><ul class="lead">
+              <li>The camel context stops and the HTTP endpoint stops returning a 200 response.</li>
+              <li>The Greeting Service returns a message that the service is not available.</li>
+              <li>Kubernetes restarts the pod and then the HTTP endpoint returns HTTP code 200.</li>
+              <li>When the pod restarts, the Greeting Service resumes displaying the greeting message.</li>
+          </ul>
+        </div>    
+
+        <div class="row">
+                <h2>Greeting Service</h2>
+                <form class="form-inline">
+                    <button id="stop" type="submit" class="btn btn-primary">Stop Camel Context</button>
+                    <button id="clear" type="submit" class="btn btn-success">Clear</button>
+                </form>
+                <h3>Results:</h3>
+                <pre style="min-height:20em;"><code id="greetings-result"></code></pre>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                var started=true;
+                function sleep(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+                async function callGreetingsService() {
+                    while (started) {
+                        $.getJSON("/camel/greetings-name/Jacopo", function (res) {
+                            $("#greetings-result").prepend(JSON.stringify(res) + "\n");
+                        })
+                        .fail(function () {
+                            $("#greetings-result").prepend("Service not available... Retrying in 5 seconds \n");
+                        });
+                        await sleep(5000);
+                    }
+                }
+                $("#clear").click(function(e) {
+                    $("#greetings-result").html("");
+                    e.preventDefault();
+                });
+                $("#stop").click(function(e) {
+                    $.get("/killswitch", function (data) {
+                        $("#greetings-result").prepend("The Camel Context has been stopped...\n");
+                    });
+                    e.preventDefault();
+                });
+                callGreetingsService();
+            });
+        </script>
+    </div>
+</body>
+</html>

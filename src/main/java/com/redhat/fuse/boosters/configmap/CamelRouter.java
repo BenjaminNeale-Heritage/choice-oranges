@@ -31,18 +31,31 @@ public class CamelRouter extends RouteBuilder {
 
         // @formatter:off
         restConfiguration()
+                .apiContextPath("/api-doc")
+                .apiProperty("api.title", "Greeting REST API")
+                .apiProperty("api.version", "1.0")
+                .apiProperty("cors", "true")
+                .apiProperty("base.path", "camel/")
+                .apiProperty("api.path", "/")
+                .apiProperty("host", "")
+                .apiContextRouteId("doc-api")
             .component("servlet")
             .bindingMode(RestBindingMode.json);
         
-        rest("/greetings").description("Greeting to configured name")
+        rest("/greetings-config").description("Greeting to configured name")
             .get("/").outType(Greetings.class)
-                .route().routeId("greeting-api")
+                .route().routeId("greeting-config-api")
                 .setHeader("name", simple("${properties:booster.nameToGreet}"))
                 .to("direct:greetingsImpl");
 
         from("direct:greetingsImpl").description("Greetings REST service implementation route")
             .streamCaching()
-            .to("bean:greetingsService?method=getGreetings");     
+            .to("bean:greetingsService?method=getGreetings");
+
+        rest("/greetings-name").description("Greeting to {name}")
+                .get("/{name}").outType(Greetings.class)
+                .route().routeId("greeting-name-api")
+                .to("direct:greetingsImpl");
         // @formatter:on
     }
 

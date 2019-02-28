@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class HttpRequestTest {
+public class GreetingsConfigRequestTest {
 
     @LocalServerPort
     private int port;
@@ -21,7 +21,7 @@ public class HttpRequestTest {
 
     @Test
     public void greetingsShouldReturnMessage() throws Exception {
-        Assert.assertEquals( "Hello, default", this.restTemplate.getForObject("http://localhost:" + port + "/camel/greetings/", Greetings.class).getGreetings());
+        Assert.assertEquals( "Hello, default", this.restTemplate.getForObject("http://localhost:" + port + "/camel/greetings-config/", Greetings.class).getGreetings());
     }
 
     @Test

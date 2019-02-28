@@ -52,7 +52,7 @@
                 }
                 async function callGreetingsService() {
                     while (started) {
-                        $.getJSON("/camel/greetings/", function (res) {
+                        $.getJSON("/camel/greetings-config/", function (res) {
                             $("#greetings-result").prepend(JSON.stringify(res) + "\n");
                         })
                         .fail(function () {

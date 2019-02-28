@@ -26,6 +26,6 @@ public interface GreetingsService {
      *
      * @return a string greetings
      */
-    Greetings getGreetings( String name);
+    Greetings getGreetings(String name);
 
 }
